@@ -652,9 +652,11 @@ LRESULT CMainDlg::OnLButtonDown(UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOO
     int y = GET_Y_LPARAM(lParam);
     if (x >= left_spliter_xpos_ - kSpliterHitTestWidth && x <= left_spliter_xpos_ + kSpliterHitTestWidth) {
         left_splitting = true;
+        ::SetCapture(m_hWnd);
     }
     else if (y >= right_spliter_ypos - kSpliterHitTestWidth && y <= right_spliter_ypos + kSpliterHitTestWidth) {
         right_splitting = true;
+        ::SetCapture(m_hWnd);
     }
     return 0;
 }
@@ -678,14 +680,9 @@ LRESULT CMainDlg::OnMouseMove(UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOOL&
     int y = GET_Y_LPARAM(lParam);
     if (x >= left_spliter_xpos_ - kSpliterHitTestWidth && x <= left_spliter_xpos_ + kSpliterHitTestWidth) {
         ::SetCursor(left_spliter_cursor);
-        ::SetCapture(m_hWnd);
     }
     else if (y >= right_spliter_ypos - kSpliterHitTestWidth && y <= right_spliter_ypos + kSpliterHitTestWidth) {
         ::SetCursor(right_spliter_cursor);
-        ::SetCapture(m_hWnd);
-    }
-    else {
-        ::ReleaseCapture();
     }
     if (wParam == MK_LBUTTON && (left_splitting || right_splitting)) {
         RECT rc;
@@ -703,7 +700,7 @@ LRESULT CMainDlg::OnMouseMove(UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOOL&
             right_spliter_ypos = y;
         }
         //根据新的分界位置发送WM_SIZE消息,重新调整左右控件的位置
-        SendMessage(m_hWnd, WM_SIZE, 0, MAKELPARAM(rc.right, rc.bottom));
+        ::PostMessage(m_hWnd, WM_SIZE, 0, MAKELPARAM(rc.right, rc.bottom));
     }
     return 0;
 }
